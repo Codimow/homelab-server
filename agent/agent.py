@@ -12,13 +12,25 @@ PARENT_ID = os.environ.get('PARENT_ID', None)
 sio = socketio.Client()
 
 def get_status():
+    try:
+        cpu = psutil.cpu_percent()
+    except Exception:
+        cpu = None
+    try:
+        ram = psutil.virtual_memory().percent
+    except Exception:
+        ram = None
+    try:
+        uptime = int(time.time() - psutil.boot_time())
+    except Exception:
+        uptime = None
     return {
         'id': DEVICE_ID,
         'parentId': PARENT_ID,
         'name': platform.node(),
-        'cpu': psutil.cpu_percent(),
-        'ram': psutil.virtual_memory().percent,
-        'uptime': int(time.time() - psutil.boot_time()),
+        'cpu': cpu,
+        'ram': ram,
+        'uptime': uptime,
     }
 
 @sio.event
